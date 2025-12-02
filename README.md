@@ -56,3 +56,13 @@ It demonstrates how to structure a clean, scalable, testable backend that handle
 
 If you're planning to expand into a **Headless Multi-Commerce Integration Platform** (Shopify, Meta, TikTok, etc.), this architecture is the right starting point.
 The broader multi-integration version is part of my private repository, but this public project showcases the core principles and patterns needed to build your own extensible, API-driven commerce sync engine.
+
+***A Headless Shopify Integration Service built with Symfony 7, providing:***
+- Product & Order ingestion
+- Order syncing (REST + GraphQL supported)
+- DTO & transformer architecture
+- Queue-based async processing via Messenger
+- Extensible mappers for omnichannel sources
+- Command-line sync tools & progress tracking
+- Fully unit-tested components
+Designed as a clean starter template for building custom Shopify headless backends.
