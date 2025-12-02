@@ -1,0 +1,73 @@
+# This file is the entry point to configure your own services.
+
+parameters:
+    shopify_api_driver: '%env(SHOPIFY_API_DRIVER)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude: '../src/{DependencyInjection,Entity,Tests,Kernel.php}'
+
+    App\Factory\ProductClientFactory:
+        arguments:
+            $driver: '%shopify_api_driver%'
+
+### PRODUCT ###
+    # REST Product Shopify client
+    App\Product\Client\ProductRestClient:
+        arguments:
+            $shopDomain: '%env(SHOPIFY_SHOP_DOMAIN)%'
+            $accessToken: '%env(SHOPIFY_ACCESS_TOKEN)%'
+            $apiVersion: '%env(SHOPIFY_REST_API_VERSION)%'
+
+    # GraphQL Product Shopify client
+    App\Product\Client\ProductGraphqlClient:
+        arguments:
+            $shopDomain: '%env(SHOPIFY_SHOP_DOMAIN)%'
+            $accessToken: '%env(SHOPIFY_ACCESS_TOKEN)%'
+            $apiVersion: '%env(SHOPIFY_GRAPHQL_API_VERSION)%'
+
+    # Allows auto toggle between REST or GraphQL usage
+    App\Product\Client\ProductClientInterface:
+        factory: ['@App\Product\Factory\ProductClientFactory', 'create']
+
+    # Transformers
+    App\Product\Transformer\ProductTransformer: ~
+
+### ORDER ###
+    # REST Order Shopify client
+    App\Order\Client\OrderRestClient:
+        arguments:
+            $shopDomain: '%env(SHOPIFY_SHOP_DOMAIN)%'
+            $accessToken: '%env(SHOPIFY_ACCESS_TOKEN)%'
+            $apiVersion: '%env(SHOPIFY_REST_API_VERSION)%'
+
+    # GraphQL Order Shopify client
+    App\Order\Client\OrderGraphqlClient:
+        arguments:
+            $shopDomain: '%env(SHOPIFY_SHOP_DOMAIN)%'
+            $accessToken: '%env(SHOPIFY_ACCESS_TOKEN)%'
+            $apiVersion: '%env(SHOPIFY_GRAPHQL_API_VERSION)%'
+
+    # Allows auto toggle between REST or GraphQL usage
+    App\Order\Client\OrderClientInterface:
+        factory: ['@App\Order\Factory\OrderClientFactory', 'create']
+
+    # Transformers
+    App\Order\Transformer\OrderTransformer: ~
+
+    # Order Sync Service
+    App\Order\Service\OrderSyncService:
+        arguments:
+            $client: '@App\Order\Client\OrderClientInterface'
+            $mapper: '@App\Order\Mapper\OrderMapper'
+            $bus: '@messenger.default_bus'
+            $logger: '@logger'
+
+    # Console Command
+    App\Command\Order\OrderSyncCommand:
+        tags: ['console.command']

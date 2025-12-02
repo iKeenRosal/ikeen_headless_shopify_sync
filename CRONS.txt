@@ -1,0 +1,2 @@
+# Runs every 15 minutes, syncing orders aged 1–72 hours.
+*/15 * * * * docker exec sass_shopify_sync-php bin/console app:sync:orders --min-hours=1 --max-hours=72 >> /var/log/order_sync.log 2>&1
